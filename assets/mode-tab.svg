@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 248" width="440" height="248" role="img">
+<rect width="440" height="248" rx="14" fill="#f4effc"/>
+<rect x="52" y="34" width="336" height="164" rx="10" fill="#ffffff" stroke="#e7e0f2"/>
+<rect x="52" y="34" width="336" height="30" rx="10" fill="#fbf8ff"/>
+<rect x="64" y="42" width="88" height="16" rx="6" fill="#9b5de5" opacity="0.18"/>
+<rect x="70" y="47" width="60" height="6" rx="3" fill="#9b5de5"/>
+<rect x="160" y="42" width="76" height="16" rx="6" fill="#efeaf7"/>
+<rect x="244" y="42" width="76" height="16" rx="6" fill="#efeaf7"/>
+<rect x="70" y="82" width="132" height="12" rx="6" fill="#d9cdee"/>
+<rect x="70" y="106" width="212" height="8" rx="4" fill="#ece5f6"/>
+<rect x="70" y="124" width="168" height="8" rx="4" fill="#ece5f6"/>
+<rect x="70" y="150" width="240" height="34" rx="8" fill="#f7f2fe" stroke="#ece5f6"/>
+<g transform="translate(290,120)">
+  <clipPath id="cb2"><circle cx="36" cy="36" r="36"/></clipPath>
+  <g clip-path="url(#cb2)"><svg x="0" y="0" width="72" height="72" viewBox="0 0 72 72">
+<defs>
+  <linearGradient id="bg22" x1="0" y1="0" x2="0.4" y2="1">
+    <stop offset="0" stop-color="#eef5f4"/><stop offset="1" stop-color="#dfeceb"/>
+  </linearGradient>
+  <linearGradient id="cl22" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#2f6f6b"/><stop offset="1" stop-color="#255955"/>
+  </linearGradient>
+</defs>
+<rect width="72" height="72" fill="url(#bg22)"/>
+<circle cx="56.160000000000004" cy="15.84" r="10.080000000000002" fill="#ffffff" opacity="0.5"/>
+
+<!-- torso -->
+<path d="M 3.6 72 C 7.2 47.52 24.48 51.839999999999996 36.0 51.839999999999996
+         C 47.52 51.839999999999996 64.8 47.52 68.39999999999999 72 Z" fill="url(#cl22)"/>
+<path d="M 30.6 52.56 L 36.0 59.76 L 41.4 52.56
+         L 39.24 51.48 L 36.0 55.800000000000004 L 32.76 51.48 Z" fill="#255955" opacity="0.9"/>
+
+<!-- neck -->
+<path d="M 32.04 37.206 h 7.92 v 7.2
+         a 3.96 3.6 0 0 1 -7.92 0 Z" fill="#b3744c"/>
+
+<!-- head -->
+<ellipse cx="36.0" cy="29.88" rx="11.16" ry="13.32" fill="#c98a5f"/>
+<ellipse cx="24.84" cy="31.4784" rx="1.5839999999999999" ry="2.3040000000000003" fill="#b3744c"/>
+<ellipse cx="47.16" cy="31.4784" rx="1.5839999999999999" ry="2.3040000000000003" fill="#b3744c"/>
+
+<!-- hair -->
+<path d="M 24.1704 28.281599999999997
+         a 11.829600000000001 14.119200000000001 0 0 1 23.659200000000002 0
+         q -4.6872 -3.996 -11.829600000000001 -3.1968
+         q -7.1424 0.7992 -11.829600000000001 3.1968 Z" fill="#1f1614"/>
+<path d="M 24.616799999999998 29.214 q 5.58 -7.3260000000000005 11.3832 -6.9264
+         q 6.9192 0.02 11.3832 6.9264
+         q -5.58 -2.9304 -11.3832 -2.664
+         q -6.249600000000001 -0.02 -11.3832 2.664 Z" fill="#150f0e"/>
+
+<!-- features, kept minimal on purpose -->
+<ellipse cx="31.3128" cy="30.1464" rx="1.1520000000000001" ry="1.44" fill="#2b2230"/>
+<ellipse cx="40.6872" cy="30.1464" rx="1.1520000000000001" ry="1.44" fill="#2b2230"/>
+<path d="M 29.0808 26.150399999999998 q 2.4552 -1.5984 4.6872 0"
+      stroke="#150f0e" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+<path d="M 38.232 26.150399999999998 q 2.232 -1.5984 4.6872 0"
+      stroke="#150f0e" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+<path d="M 34.884 32.544 q 1.116 1.332 2.0088 0"
+      stroke="#b3744c" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+<path d="M 32.652 36.54 q 3.348 3.4632 6.696 0"
+      stroke="#8a4b48" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+</svg></g>
+  <circle cx="36" cy="36" r="36" fill="none" stroke="#ffffff" stroke-width="4"/>
+</g>
+<rect x="120" y="212" width="200" height="10" rx="5" fill="#ded4f0"/>
+</svg>

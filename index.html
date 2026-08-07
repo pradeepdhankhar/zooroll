@@ -1,0 +1,2358 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Zooroll — record your screen, your camera, and your point</title>
+  <meta name="description"
+    content="A Chrome recorder that keeps everything on your machine. Screen, tab or camera, a draggable camera bubble, and a highlighter you can draw with while you record." />
+  <link rel="icon" href="zooroll-logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet" />
+
+  <style>
+    /* ============================================================
+         Zooroll — landing page
+         Palette and type follow the extension itself: light surfaces,
+         one purple, and a red that only ever means "recording".
+         ============================================================ */
+
+    :root {
+      --ink: #fbfbfb;
+      --surface: #ffffff;
+      --surface-2: #f4effc;
+      --line: #e7e0f2;
+      --line-soft: #efeaf7;
+      --text: #1c1826;
+      --muted: #6c6580;
+
+      --primary: #9b5de5;
+      --primary-strong: #8348d6;
+      --primary-soft: rgba(155, 93, 229, 0.12);
+
+      --tally: #e5484d;
+      --marker: #ffd23f;
+
+      --display: "Bricolage Grotesque", "Trebuchet MS", system-ui, sans-serif;
+      --body: "Instrument Sans", system-ui, -apple-system, sans-serif;
+      --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+      --shadow-sm: 0 1px 2px rgba(28, 24, 38, 0.05), 0 6px 18px rgba(28, 24, 38, 0.05);
+      --shadow-lg: 0 2px 6px rgba(28, 24, 38, 0.06), 0 28px 60px rgba(28, 24, 38, 0.12);
+      --radius: 14px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+      margin: 0;
+      background: var(--ink);
+      color: var(--text);
+      font-family: var(--body);
+      font-size: 16px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    img {
+      max-width: 100%;
+      display: block;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    .wrap {
+      width: min(1120px, 100% - 48px);
+      margin-inline: auto;
+    }
+
+    .section {
+      padding: 104px 0;
+    }
+
+    .section--tight {
+      padding: 72px 0;
+    }
+
+    /* ---------- type scale ---------- */
+
+    h1,
+    h2,
+    h3 {
+      font-family: var(--display);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.05;
+      margin: 0;
+    }
+
+    h1 {
+      font-size: clamp(2.6rem, 6.4vw, 4.6rem);
+      font-variation-settings: "wdth" 92;
+    }
+
+    h2 {
+      font-size: clamp(1.9rem, 3.6vw, 2.9rem);
+    }
+
+    h3 {
+      font-size: 1.18rem;
+      letter-spacing: -0.02em;
+      line-height: 1.25;
+    }
+
+    p {
+      margin: 0;
+    }
+
+    .eyebrow {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--primary);
+      margin-bottom: 14px;
+    }
+
+    .lede {
+      color: var(--muted);
+      font-size: 1.08rem;
+    }
+
+    /* A real tool in the product, used here as a typographic device. */
+    .marked {
+      background: linear-gradient(transparent 58%, rgba(255, 210, 63, 0.62) 58%);
+      background-size: 0% 100%;
+      background-repeat: no-repeat;
+      animation: swipe 0.7s 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    @keyframes swipe {
+      to {
+        background-size: 100% 100%;
+      }
+    }
+
+    /* ---------- buttons ---------- */
+
+    .btn {
+      appearance: none;
+      font: inherit;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      padding: 13px 22px;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      cursor: pointer;
+      text-decoration: none;
+      transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+    }
+
+    .btn--primary {
+      background: var(--primary);
+      color: #fff;
+      box-shadow: 0 6px 18px rgba(155, 93, 229, 0.28);
+    }
+
+    .btn--primary:hover {
+      background: var(--primary-strong);
+      transform: translateY(-1px);
+    }
+
+    .btn--ghost {
+      background: var(--surface);
+      border-color: var(--line);
+      color: var(--text);
+    }
+
+    .btn--ghost:hover {
+      background: var(--surface-2);
+      border-color: #d8ccec;
+    }
+
+    .btn--sm {
+      padding: 9px 16px;
+      font-size: 0.9rem;
+    }
+
+    :is(a, button, input, textarea, select, [tabindex]):focus-visible {
+      outline: 2px solid var(--primary);
+      outline-offset: 3px;
+      border-radius: 6px;
+    }
+
+    /* ---------- header ---------- */
+
+    .masthead {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background: rgba(251, 251, 251, 0.86);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid transparent;
+      transition: border-color 0.2s ease;
+    }
+
+    .masthead[data-stuck="1"] {
+      border-bottom-color: var(--line);
+    }
+
+    .masthead__inner {
+      display: flex;
+      align-items: center;
+      gap: 22px;
+      padding: 14px 0;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: var(--display);
+      font-weight: 700;
+      font-size: 1.16rem;
+      letter-spacing: -0.02em;
+      text-decoration: none;
+      margin-right: auto;
+    }
+
+    .brand img {
+      width: 30px;
+      height: 30px;
+    }
+
+    .nav {
+      display: flex;
+      gap: 26px;
+    }
+
+    .nav a {
+      text-decoration: none;
+      color: var(--muted);
+      font-size: 0.93rem;
+      transition: color 0.15s ease;
+    }
+
+    .nav a:hover {
+      color: var(--text);
+    }
+
+    /* ---------- hero ---------- */
+
+    .hero {
+      padding: 76px 0 0;
+    }
+
+    .hero__head {
+      max-width: 100%;
+      text-align: center;
+    }
+
+    .hero h1 {
+      margin-bottom: 22px;
+    }
+
+    .hero .lede {
+      font-size: 1.16rem;
+    }
+
+    .hero__actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      justify-content: center;
+      margin: 30px 0 14px;
+    }
+
+    .hero__note {
+      font-family: var(--mono);
+      font-size: 0.76rem;
+      color: var(--muted);
+      letter-spacing: 0.02em;
+    }
+
+    /* ---------- the stage: signature element ---------- */
+
+    .stage-shell {
+      margin-top: 54px;
+      position: relative;
+    }
+
+    .stage {
+      position: relative;
+      border-radius: 18px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+      touch-action: none;
+    }
+
+    .stage__chrome {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--line-soft);
+      background: linear-gradient(#fff, #fcfaff);
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #e6e0f0;
+    }
+
+    .stage__url {
+      margin-left: 10px;
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      color: var(--muted);
+      background: var(--surface-2);
+      border-radius: 999px;
+      padding: 5px 14px;
+    }
+
+    .stage__live {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--mono);
+      font-size: 0.74rem;
+      color: var(--text);
+    }
+
+    .lamp {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--tally);
+      box-shadow: 0 0 0 3px rgba(229, 72, 77, 0.16);
+      animation: blink 1.7s ease-in-out infinite;
+    }
+
+    @keyframes blink {
+      50% {
+        opacity: 0.3;
+      }
+    }
+
+    .stage__body {
+      position: relative;
+      aspect-ratio: 16 / 9;
+      background: radial-gradient(120% 120% at 12% 0%, #fbf8ff 0%, #f6f2fb 55%, #f2edf9 100%);
+      cursor: crosshair;
+    }
+
+    /* The page records itself: a real render of this page, scaled to fit the
+         frame. Loaded with ?embed=1 so the embedded copy leaves the stage out
+         and cannot nest forever. */
+    .stage__page {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 1440px;
+      height: 810px;
+      border: 0;
+      transform-origin: top left;
+      pointer-events: none;
+      user-select: none;
+      background: var(--ink);
+    }
+
+    .stage__veil {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(251, 251, 251, 0) 62%, rgba(251, 251, 251, 0.55) 100%);
+      pointer-events: none;
+    }
+
+    /* Kept as the fallback if the frame cannot load (file:// in some browsers) */
+    .mock {
+      position: absolute;
+      inset: 0;
+      padding: 7% 8%;
+      display: flex;
+      flex-direction: column;
+      gap: 3.2%;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .mock__row {
+      height: 11px;
+      border-radius: 6px;
+      background: #e9e2f4;
+    }
+
+    .mock__row--title {
+      height: 20px;
+      width: 46%;
+      background: #d9cdee;
+    }
+
+    .mock__row--short {
+      width: 62%;
+    }
+
+    .mock__row--shorter {
+      width: 38%;
+    }
+
+    .mock__cards {
+      display: flex;
+      gap: 3%;
+      margin-top: auto;
+    }
+
+    .mock__card {
+      flex: 1;
+      border-radius: 12px;
+      background: #fff;
+      border: 1px solid #ece5f6;
+      height: 96px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      gap: 7px;
+    }
+
+    .mock__bar {
+      border-radius: 4px;
+      background: var(--primary-soft);
+      height: 8px;
+    }
+
+    .mock__bar--tall {
+      height: 34px;
+      background: linear-gradient(var(--primary-soft), rgba(155, 93, 229, 0.28));
+    }
+
+    #ink {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* the camera bubble — draggable, exactly as in the extension */
+    .bubble {
+      position: absolute;
+      left: 68%;
+      top: 52%;
+      width: 23%;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      border: 3px solid #fff;
+      box-shadow: 0 10px 30px rgba(28, 24, 38, 0.22);
+      background: radial-gradient(120% 120% at 30% 20%, #b98af0, #7f43cf);
+      overflow: hidden;
+      cursor: grab;
+      display: grid;
+      place-items: end center;
+    }
+
+    .bubble:active {
+      cursor: grabbing;
+    }
+
+    .bubble video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transform: scaleX(-1);
+      /* a self-view is mirrored, like a mirror */
+      display: none;
+    }
+
+    .bubble[data-cam="live"] video {
+      display: block;
+    }
+
+    .bubble[data-cam="live"] .bubble__figure,
+    .bubble[data-cam="live"] .bubble__cta {
+      display: none;
+    }
+
+    .bubble__figure {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .bubble__cta {
+      position: absolute;
+      inset: auto 8% 12%;
+      text-align: center;
+      font-family: var(--body);
+      font-size: 0.72rem;
+      font-weight: 600;
+      line-height: 1.3;
+      color: #4a2380;
+      background: rgba(255, 255, 255, 0.94);
+      border: 0;
+      border-radius: 999px;
+      padding: 7px 10px;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(28, 24, 38, 0.2);
+    }
+
+    .bubble__cta:hover {
+      background: #fff;
+    }
+
+    .bubble[data-cam="denied"] .bubble__cta {
+      font-size: 0.66rem;
+      inset: auto 6% 10%;
+      line-height: 1.25;
+    }
+
+    .bubble__head {
+      position: absolute;
+      left: 50%;
+      top: 6%;
+      width: 46%;
+      aspect-ratio: 1;
+      transform: translateX(-50%);
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.9);
+    }
+
+    .bubble__body {
+      position: absolute;
+      left: 50%;
+      bottom: 0;
+      width: 100%;
+      height: 52%;
+      transform: translateX(-50%);
+      border-radius: 999px 999px 0 0;
+      background: rgba(255, 255, 255, 0.9);
+    }
+
+    .bubble__hint {
+      position: absolute;
+      inset: auto 0 -30px;
+      text-align: center;
+      font-family: var(--mono);
+      font-size: 0.66rem;
+      color: var(--muted);
+      opacity: 0.9;
+    }
+
+    /* blinker pulse */
+    .blink {
+      position: absolute;
+      width: 0;
+      height: 0;
+      pointer-events: none;
+    }
+
+    .blink span {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 20px;
+      height: 20px;
+      margin: -10px 0 0 -10px;
+      border-radius: 50%;
+      border: 3px solid currentColor;
+      animation: ring 1.2s ease-out forwards;
+    }
+
+    .blink span:nth-child(2) {
+      animation-delay: 0.28s;
+    }
+
+    .blink span:nth-child(3) {
+      animation-delay: 0.56s;
+    }
+
+    .blink b {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 14px;
+      height: 14px;
+      margin: -7px 0 0 -7px;
+      border-radius: 50%;
+      background: currentColor;
+      animation: fade 1.9s ease-out forwards;
+    }
+
+    @keyframes ring {
+      from {
+        transform: scale(0.4);
+        opacity: 0.9;
+      }
+
+      to {
+        transform: scale(4.4);
+        opacity: 0;
+      }
+    }
+
+    @keyframes fade {
+      to {
+        opacity: 0;
+        transform: scale(0.7);
+      }
+    }
+
+    /* floating toolbar, mirroring the one injected into the page */
+    .toolbar {
+      position: absolute;
+      left: 50%;
+      bottom: 18px;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 9px;
+      border-radius: 999px;
+      background: #fff;
+      border: 1px solid var(--line);
+      box-shadow: 0 8px 26px rgba(28, 24, 38, 0.16);
+    }
+
+    .toolbar__time {
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      font-variant-numeric: tabular-nums;
+      padding: 0 6px;
+    }
+
+    .tool {
+      width: 30px;
+      height: 28px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: var(--surface-2);
+      color: var(--text);
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      font-size: 0.85rem;
+      padding: 0;
+      transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+    }
+
+    .tool[aria-pressed="true"] {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #fff;
+    }
+
+    .swatch {
+      width: 17px;
+      height: 17px;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      box-shadow: inset 0 0 0 1px rgba(28, 24, 38, 0.14);
+      cursor: pointer;
+      padding: 0;
+    }
+
+    .swatch[aria-pressed="true"] {
+      border-color: var(--text);
+    }
+
+    .stage__caption {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+      font-family: var(--mono);
+      font-size: 0.74rem;
+      color: var(--muted);
+    }
+
+    .stage__caption b {
+      color: var(--primary);
+      font-weight: 500;
+    }
+
+    /* ---------- facts strip ---------- */
+
+    .facts {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--line);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .fact {
+      background: var(--surface);
+      padding: 26px 24px;
+    }
+
+    .fact__k {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--primary);
+      margin-bottom: 8px;
+    }
+
+    .fact p {
+      color: var(--muted);
+      font-size: 0.94rem;
+    }
+
+    .fact strong {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    /* ---------- modes ---------- */
+
+    .modes {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 46px;
+      align-items: start;
+    }
+
+    .modes__list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 26px;
+    }
+
+    .mode {
+      text-align: left;
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: 12px;
+      padding: 14px 16px;
+      cursor: pointer;
+      font: inherit;
+      color: var(--muted);
+      transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+    }
+
+    .mode strong {
+      display: block;
+      font-family: var(--display);
+      font-size: 1.05rem;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      margin-bottom: 2px;
+    }
+
+    .mode:hover {
+      background: var(--surface);
+    }
+
+    .mode[aria-selected="true"] {
+      background: var(--surface);
+      border-color: var(--line);
+      box-shadow: var(--shadow-sm);
+      color: var(--text);
+    }
+
+    .modes__panel {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+      box-shadow: var(--shadow-sm);
+      padding: 28px;
+      min-height: 320px;
+    }
+
+    .modeview {
+      display: none;
+    }
+
+    .modeview[data-active="1"] {
+      display: block;
+      animation: rise 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    @keyframes rise {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+    }
+
+    .modeview__art {
+      border-radius: 12px;
+      border: 1px solid var(--line-soft);
+      overflow: hidden;
+      margin-bottom: 20px;
+      background: var(--surface-2);
+    }
+
+    .modeview__art img {
+      width: 100%;
+      display: block;
+    }
+
+    .art-frame {
+      position: absolute;
+      inset: 14%;
+      border-radius: 10px;
+      background: #fff;
+      border: 1px solid var(--line);
+    }
+
+    .art-frame--tab {
+      inset: 10% 18%;
+    }
+
+    .art-bubble {
+      position: absolute;
+      right: 12%;
+      bottom: 12%;
+      width: 22%;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      border: 3px solid #fff;
+      background: radial-gradient(120% 120% at 30% 20%, #b98af0, #7f43cf);
+      box-shadow: 0 8px 20px rgba(28, 24, 38, 0.18);
+    }
+
+    .art-bubble--full {
+      inset: 10%;
+      width: auto;
+      right: auto;
+      bottom: auto;
+      border-radius: 14px;
+    }
+
+    .modeview h3 {
+      margin-bottom: 8px;
+    }
+
+    .modeview p {
+      color: var(--muted);
+    }
+
+    .modeview ul {
+      list-style: none;
+      padding: 0;
+      margin: 18px 0 0;
+      display: grid;
+      gap: 9px;
+    }
+
+    .modeview li {
+      display: flex;
+      gap: 10px;
+      font-size: 0.95rem;
+      color: var(--muted);
+    }
+
+    .modeview li::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--primary);
+      margin-top: 9px;
+      flex: 0 0 auto;
+    }
+
+    /* ---------- feature grid ---------- */
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 20px;
+      margin-top: 46px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 28px;
+      box-shadow: var(--shadow-sm);
+      grid-column: span 2;
+    }
+
+    .card--wide {
+      grid-column: span 3;
+    }
+
+    .card--full {
+      grid-column: span 6;
+    }
+
+    .card h3 {
+      margin-bottom: 10px;
+    }
+
+    .card p {
+      color: var(--muted);
+      font-size: 0.96rem;
+    }
+
+    .card__tag {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: 0.66rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--primary);
+      background: var(--primary-soft);
+      border-radius: 999px;
+      padding: 4px 11px;
+      margin-bottom: 16px;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 18px;
+    }
+
+    .chip {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 5px 11px;
+      color: var(--muted);
+    }
+
+    .shapes {
+      display: flex;
+      gap: 14px;
+      margin-top: 22px;
+    }
+
+    .shape {
+      width: 76px;
+      height: 76px;
+      overflow: hidden;
+      border: 4px solid var(--primary);
+      background: var(--primary-soft);
+      flex: 0 0 auto;
+      display: flex;
+    }
+
+
+    .shape--circle {
+      border-radius: 50%;
+    }
+
+    .shape--rounded {
+      border-radius: 16px;
+    }
+
+    .shape__label {
+      display: block;
+      margin-top: 8px;
+      font-family: var(--mono);
+      font-size: 0.66rem;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .shape-item {
+      text-align: center;
+    }
+
+    /* ---------- steps ---------- */
+
+    .steps {
+      counter-reset: step;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-top: 42px;
+    }
+
+    .step {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 26px;
+    }
+
+    .step__n {
+      counter-increment: step;
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      color: var(--primary);
+      letter-spacing: 0.14em;
+    }
+
+    .step__n::before {
+      content: "STEP " counter(step);
+    }
+
+    .step h3 {
+      margin: 12px 0 8px;
+    }
+
+    .step p {
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .step code {
+      font-family: var(--mono);
+      font-size: 0.85em;
+      background: var(--surface-2);
+      border-radius: 5px;
+      padding: 2px 6px;
+    }
+
+    /* ---------- specs ---------- */
+
+    .specs {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      overflow: hidden;
+      background: var(--surface);
+      margin-top: 40px;
+    }
+
+    .spec {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 20px;
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--line-soft);
+    }
+
+    .spec:last-child {
+      border-bottom: 0;
+    }
+
+    .spec dt {
+      font-family: var(--mono);
+      font-size: 0.74rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding-top: 2px;
+    }
+
+    .spec dd {
+      margin: 0;
+      font-size: 0.96rem;
+    }
+
+    /* ---------- feedback ---------- */
+
+    .feedback {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+      display: grid;
+      grid-template-columns: 1fr 1.25fr;
+    }
+
+    .feedback__side {
+      padding: 44px;
+      background: linear-gradient(160deg, #f7f2fe, #fdfcff);
+      border-right: 1px solid var(--line-soft);
+    }
+
+    .feedback__side h2 {
+      margin-bottom: 14px;
+    }
+
+    .feedback__side p {
+      color: var(--muted);
+      font-size: 0.98rem;
+    }
+
+    .feedback__list {
+      list-style: none;
+      margin: 26px 0 0;
+      padding: 0;
+      display: grid;
+      gap: 14px;
+    }
+
+    .feedback__list li {
+      display: flex;
+      gap: 11px;
+      font-size: 0.92rem;
+      color: var(--muted);
+    }
+
+    .feedback__list img {
+      width: 16px;
+      height: 16px;
+      margin-top: 4px;
+      flex: 0 0 auto;
+    }
+
+    .form {
+      padding: 44px;
+      display: grid;
+      gap: 20px;
+    }
+
+    .field {
+      display: grid;
+      gap: 7px;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    .field>label {
+      font-size: 0.86rem;
+      font-weight: 600;
+    }
+
+    .field__help {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    input[type="text"],
+    input[type="email"],
+    textarea,
+    select {
+      font: inherit;
+      font-size: 0.95rem;
+      color: var(--text);
+      background: var(--ink);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 11px 13px;
+      width: 100%;
+    }
+
+    textarea {
+      min-height: 128px;
+      resize: vertical;
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+      color: #a49dba;
+    }
+
+    .segmented {
+      display: flex;
+      gap: 4px;
+      background: var(--surface-2);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 4px;
+    }
+
+    .segmented button {
+      flex: 1;
+      font: inherit;
+      font-size: 0.87rem;
+      padding: 8px 10px;
+      border: 0;
+      border-radius: 999px;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+    }
+
+    .segmented button[aria-pressed="true"] {
+      background: var(--surface);
+      color: var(--primary);
+      box-shadow: var(--shadow-sm);
+      font-weight: 600;
+    }
+
+    /* Rating in petals rather than stars — the mark is the unit. */
+    .petals {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .petal {
+      border: 0;
+      background: none;
+      padding: 3px;
+      cursor: pointer;
+      line-height: 0;
+      border-radius: 50%;
+    }
+
+    .petal img {
+      width: 26px;
+      height: 26px;
+      filter: grayscale(1) opacity(0.28);
+      transition: filter 0.15s ease, transform 0.15s ease;
+    }
+
+    .petal[data-on="1"] img {
+      filter: none;
+      transform: scale(1.06);
+    }
+
+    .petals__label {
+      font-family: var(--mono);
+      font-size: 0.74rem;
+      color: var(--muted);
+      margin-left: 8px;
+    }
+
+    .form__foot {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .form__status {
+      font-size: 0.86rem;
+      color: var(--muted);
+      min-height: 20px;
+    }
+
+    .form__status[data-tone="ok"] {
+      color: #1f9d6b;
+    }
+
+    .form__status[data-tone="error"] {
+      color: #c0392f;
+    }
+
+    .two-up {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    /* ---------- faq ---------- */
+
+    .faq {
+      margin-top: 36px;
+      border-top: 1px solid var(--line);
+    }
+
+    details {
+      border-bottom: 1px solid var(--line);
+    }
+
+    summary {
+      cursor: pointer;
+      padding: 20px 0;
+      font-family: var(--display);
+      font-size: 1.06rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      list-style: none;
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    summary::-webkit-details-marker {
+      display: none;
+    }
+
+    summary::after {
+      content: "+";
+      color: var(--primary);
+      font-family: var(--mono);
+      font-weight: 400;
+    }
+
+    details[open] summary::after {
+      content: "–";
+    }
+
+    details p {
+      color: var(--muted);
+      padding-bottom: 22px;
+      max-width: 74ch;
+      font-size: 0.96rem;
+    }
+
+    /* ---------- footer ---------- */
+
+    .footer {
+      border-top: 1px solid var(--line);
+      padding: 40px 0 56px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    /* The embedded copy drops the stage (no infinite nesting) and the sticky
+         bar (the frame already draws browser chrome). */
+    [data-embed="1"] .masthead,
+    [data-embed="1"] .stage-shell,
+    [data-embed="1"] #feedback,
+    [data-embed="1"] .footer {
+      display: none !important;
+    }
+
+    [data-embed="1"] .hero {
+      padding-top: 40px;
+    }
+
+    /* ---------- reveal ---------- */
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1), transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .reveal[data-seen="1"] {
+      opacity: 1;
+      transform: none;
+    }
+
+    /* ---------- responsive ---------- */
+
+    @media (max-width: 940px) {
+      .section {
+        padding: 76px 0;
+      }
+
+      .modes,
+      .feedback {
+        grid-template-columns: 1fr;
+      }
+
+      .feedback__side {
+        border-right: 0;
+        border-bottom: 1px solid var(--line-soft);
+      }
+
+      .grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .card,
+      .card--wide,
+      .card--full {
+        grid-column: span 2;
+      }
+
+      .steps,
+      .facts {
+        grid-template-columns: 1fr;
+      }
+
+      .nav {
+        display: none;
+      }
+    }
+
+    @media (max-width: 620px) {
+      .wrap {
+        width: min(1120px, 100% - 32px);
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .card,
+      .card--wide,
+      .card--full {
+        grid-column: span 1;
+      }
+
+      .two-up {
+        grid-template-columns: 1fr;
+      }
+
+      .feedback__side,
+      .form {
+        padding: 30px 24px;
+      }
+
+      .spec {
+        grid-template-columns: 1fr;
+        gap: 6px;
+      }
+
+      .toolbar {
+        gap: 5px;
+        padding: 6px;
+        bottom: 10px;
+      }
+
+      .tool {
+        width: 26px;
+        height: 25px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
+      }
+
+      .reveal {
+        opacity: 1;
+        transform: none;
+      }
+
+      .marked {
+        background-size: 100% 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="masthead" id="masthead">
+    <div class="wrap masthead__inner">
+      <a class="brand" href="#top">
+        <img src="zooroll-logo.png" alt="" width="30" height="30" />
+        Zooroll
+      </a>
+      <nav class="nav">
+        <a href="#modes">Recording</a>
+        <a href="#features">Features</a>
+        <a href="#specs">Specs</a>
+        <a href="#feedback">Feedback</a>
+      </nav>
+      <a class="btn btn--primary btn--sm" target="_blank"
+        href="https://chromewebstore.google.com/detail/zooroll-%E2%80%94-free-screen-cam/ephknfldlkocpgimmmipinfcpnmecbca">Get
+        Zooroll</a>
+    </div>
+  </header>
+
+  <main id="top">
+    <!-- ============ HERO ============ -->
+    <section class="hero">
+      <div class="wrap">
+        <div class="hero__head">
+          <p class="eyebrow">Chrome extension · nothing leaves your machine</p>
+          <h1>Record your screen, your camera, and <span class="marked">your point</span>.</h1>
+          <p class="lede" style="margin-top: 22px">
+            Zooroll records a screen, a tab, or just your camera — with a bubble of you in the corner and a
+            highlighter you can draw with while the recording runs. The file lands in your Downloads folder.
+            There is no account and no upload.
+          </p>
+          <div class="hero__actions">
+            <a class="btn btn--primary" target="_blank"
+              href="https://chromewebstore.google.com/detail/zooroll-%E2%80%94-free-screen-cam/ephknfldlkocpgimmmipinfcpnmecbca">Get
+              Zooroll</a>
+            <a class="btn btn--ghost" href="#feedback">Ask for a feature</a>
+          </div>
+          <p class="hero__note">Free · no sign-in · works offline</p>
+        </div>
+
+        <!-- Signature: a recording you can actually draw on -->
+        <div class="stage-shell">
+          <div class="stage">
+            <div class="stage__chrome">
+              <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+              <span class="stage__url">quarterly-review.internal</span>
+              <span class="stage__live"><i class="lamp"></i> REC <b id="clock">00:00:04</b></span>
+            </div>
+
+            <div class="stage__body" id="stageBody">
+              <iframe class="stage__page" id="stagePage" src="index.html#embed"
+                title="A live render of this page, as it would look while being recorded" aria-hidden="true"
+                tabindex="-1" scrolling="no"></iframe>
+              <div class="stage__veil" aria-hidden="true"></div>
+
+              <canvas id="ink"></canvas>
+
+              <div class="bubble" id="bubble" data-cam="off" tabindex="0" role="button"
+                aria-label="Camera bubble — drag to move">
+                <video id="bubbleVideo" muted playsinline autoplay></video>
+                <img class="bubble__figure" src="assets/person-bubble.jpg"
+                  onerror="this.onerror=null;this.src='assets/person-bubble.svg'" alt="" aria-hidden="true" />
+                <button class="bubble__cta" id="camCta" type="button">Put me in it</button>
+              </div>
+
+              <div class="toolbar" role="toolbar" aria-label="Annotation tools">
+                <span class="toolbar__time" id="toolClock">00:00:04</span>
+                <button class="tool" data-tool="highlighter" aria-pressed="true" title="Highlighter">▬</button>
+                <button class="tool" data-tool="pen" aria-pressed="false" title="Pen">✎</button>
+                <button class="tool" data-tool="blink" aria-pressed="false" title="Blinker">◎</button>
+                <button class="swatch" data-color="#ffd23f" aria-pressed="true" style="background:#ffd23f"
+                  title="Yellow"></button>
+                <button class="swatch" data-color="#9b5de5" aria-pressed="false" style="background:#9b5de5"
+                  title="Purple"></button>
+                <button class="swatch" data-color="#e5484d" aria-pressed="false" style="background:#e5484d"
+                  title="Red"></button>
+                <button class="tool" data-act="clear" title="Clear marks">✕</button>
+              </div>
+            </div>
+          </div>
+          <p class="stage__caption">
+            <span>This is live — <b>drag the bubble</b>, draw on the page, or pick the blinker and click
+              something.</span>
+            <span id="camOffLink" hidden>· <b><button type="button" id="camOff"
+                  style="all:unset;cursor:pointer;color:var(--primary)">Turn my camera off</button></b></span>
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ FACTS ============ -->
+    <section class="section section--tight">
+      <div class="wrap">
+        <div class="facts reveal">
+          <div class="fact">
+            <p class="fact__k">Where files go</p>
+            <p><strong>Your Downloads folder</strong>, in a subfolder you choose. Named with the date and time so
+              nothing collides.</p>
+          </div>
+          <div class="fact">
+            <p class="fact__k">Where video goes</p>
+            <p><strong>Nowhere.</strong> The extension holds no network permissions. Recording works with the wifi off.
+            </p>
+          </div>
+          <div class="fact">
+            <p class="fact__k">What it costs</p>
+            <p><strong>Nothing</strong>, and there is no account to make. No watermark, no length limit, no upsell.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ MODES ============ -->
+    <section class="section" id="modes">
+      <div class="wrap">
+        <div class="modes">
+          <div>
+            <p class="eyebrow">Three ways to record</p>
+            <h2>Pick a source, press record.</h2>
+            <div class="modes__list" role="tablist" aria-label="Recording modes">
+              <button class="mode" role="tab" aria-selected="true" data-mode="screen">
+                <strong>Screen</strong>
+                Any display or application window
+              </button>
+              <button class="mode" role="tab" aria-selected="false" data-mode="tab">
+                <strong>This tab</strong>
+                One page, even while you work elsewhere
+              </button>
+              <button class="mode" role="tab" aria-selected="false" data-mode="camera">
+                <strong>Camera only</strong>
+                Just you, full frame
+              </button>
+            </div>
+          </div>
+
+          <div class="modes__panel">
+            <div class="modeview" data-view="screen" data-active="1">
+              <div class="modeview__art">
+                <img src="assets/mode-screen.jpg" onerror="this.onerror=null;this.src='assets/mode-screen.svg'"
+                  alt="A desktop being recorded, with a round camera bubble in the lower right" width="440"
+                  height="248" />
+              </div>
+              <h3>Record a whole display or a single window</h3>
+              <p>Chrome asks which one. Zooroll composites your camera on top and writes the result straight to disk.
+              </p>
+              <ul>
+                <li>Captures at your display's real resolution, capped at 1080p by default to keep playback smooth</li>
+                <li>Ends cleanly when you click Chrome's own "Stop sharing" bar</li>
+                <li>System sound and microphone mixed into one track, without the echo loop</li>
+              </ul>
+            </div>
+
+            <div class="modeview" data-view="tab">
+              <div class="modeview__art">
+                <img src="assets/mode-tab.jpg" onerror="this.onerror=null;this.src='assets/mode-tab.svg'"
+                  alt="A browser window with one tab highlighted and a camera bubble in the corner" width="440"
+                  height="248" />
+              </div>
+              <h3>Record one tab and leave it running</h3>
+              <p>Tab capture follows the page, not the screen, so you can answer a message in another window without it
+                appearing in the recording.</p>
+              <ul>
+                <li>Captures the page audio as well as the picture</li>
+                <li>You still hear the tab while it records, unless your microphone is on</li>
+                <li>Survives switching windows, resizing and scrolling</li>
+              </ul>
+            </div>
+
+            <div class="modeview" data-view="camera">
+              <div class="modeview__art">
+                <img src="assets/mode-camera.jpg" onerror="this.onerror=null;this.src='assets/mode-camera.svg'"
+                  alt="A camera-only recording filling the frame" width="440" height="248" />
+              </div>
+              <h3>Record just your camera</h3>
+              <p>For interview answers, intros and video replies to a long email. No source picker, no screen — your
+                camera fills the frame.</p>
+              <ul>
+                <li>A self-view window shows you exactly what is being recorded</li>
+                <li>Mirror the picture for yourself; the file is saved unmirrored</li>
+                <li>Requested at 1080p where your camera supports it</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ FEATURES ============ -->
+    <section class="section" id="features">
+      <div class="wrap">
+        <p class="eyebrow reveal">What you get</p>
+        <h2 class="reveal">Built for the recording you actually make.</h2>
+        <p class="lede reveal" style="margin-top: 14px">
+          Not a demo reel of features — these are the things that decide whether a recording is worth sending.
+        </p>
+
+        <div class="grid">
+          <div class="card card--wide reveal">
+            <span class="card__tag">Camera bubble</span>
+            <h3>A bubble of you, wherever you want it</h3>
+            <p>
+              Drag it anywhere on the frame, during the recording, from the page itself. Circle, rounded or square,
+              sized from 10% to 40% of the width, mirrored if you prefer seeing yourself the way a mirror does.
+            </p>
+            <div class="shapes">
+              <div class="shape-item">
+                <span class="shape shape--circle"><img src="assets/shape-circle.jpg"
+                    onerror="this.onerror=null;this.src='assets/shape-circle.svg'" alt="Circular camera frame"
+                    width="76" height="76" /></span>
+                <span class="shape__label">Circle</span>
+              </div>
+              <div class="shape-item">
+                <span class="shape shape--rounded"><img src="assets/shape-rounded.jpg"
+                    onerror="this.onerror=null;this.src='assets/shape-rounded.svg'" alt="Rounded square camera frame"
+                    width="76" height="76" /></span>
+                <span class="shape__label">Rounded</span>
+              </div>
+              <div class="shape-item">
+                <span class="shape"><img src="assets/shape-square.jpg"
+                    onerror="this.onerror=null;this.src='assets/shape-square.svg'" alt="Square camera frame" width="76"
+                    height="76" /></span>
+                <span class="shape__label">Square</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card card--wide reveal">
+            <span class="card__tag">Annotation</span>
+            <h3>Draw while you record</h3>
+            <p>
+              A highlighter for sweeping over a paragraph, a pen for circling a button, a text tool for labels, and a
+              blinker that fires three rings at whatever you click and fades after three seconds — for pointing
+              without leaving a mark behind.
+            </p>
+            <div class="chips">
+              <span class="chip">Highlighter</span>
+              <span class="chip">Pen</span>
+              <span class="chip">Text</span>
+              <span class="chip">Blinker</span>
+              <span class="chip">Undo</span>
+              <span class="chip">5 colours</span>
+            </div>
+          </div>
+
+          <div class="card reveal">
+            <span class="card__tag">Sound</span>
+            <h3>Two sources, one clean track</h3>
+            <p>
+              System sound and your microphone are mixed properly, and the mix never reaches your speakers while the
+              mic is live — which is what causes echo. Noise cancellation uses voice isolation where Chrome offers it.
+            </p>
+          </div>
+
+          <div class="card reveal">
+            <span class="card__tag">Countdown</span>
+            <h3>Three seconds to get set</h3>
+            <p>
+              The count appears on screen but never in the file: the encoder does not start until it reaches zero.
+              Cancel mid-count and nothing is written at all.
+            </p>
+          </div>
+
+          <div class="card reveal">
+            <span class="card__tag">Picture</span>
+            <h3>Sharp text, sensible files</h3>
+            <p>
+              1080p at 30fps by default, up to native resolution and 120fps if you want it. The encoder is told to
+              protect small text, so code and UI stay legible.
+            </p>
+          </div>
+
+          <div class="card card--full reveal">
+            <span class="card__tag">Afterwards</span>
+            <h3>The file is ready before you have stopped talking</h3>
+            <p>
+              When you stop, the recording opens on its own page: play it back, reveal it in your folder, or hand it
+              straight to your system share sheet — WhatsApp, Mail, Messages, AirDrop, whatever you have installed.
+              Nothing is uploaded to make that work.
+            </p>
+            <div class="chips">
+              <span class="chip">WebM · VP9 + Opus</span>
+              <span class="chip">MP4 where Chrome supports it</span>
+              <span class="chip">Custom subfolder</span>
+              <span class="chip">Share sheet</span>
+              <span class="chip">Pause and resume</span>
+              <span class="chip">Alt+Shift+S to stop</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ============ SPECS ============ -->
+    <section class="section" id="specs">
+      <div class="wrap">
+        <p class="eyebrow reveal">The details</p>
+        <h2 class="reveal">Specifications</h2>
+
+        <dl class="specs reveal">
+          <div class="spec">
+            <dt>Sources</dt>
+            <dd>Whole display, application window, single tab, or camera only</dd>
+          </div>
+          <div class="spec">
+            <dt>Resolution</dt>
+            <dd>1080p by default · 720p, 1440p, 2160p or your display's native size</dd>
+          </div>
+          <div class="spec">
+            <dt>Frame rate</dt>
+            <dd>24, 30, 60 or 120 fps, switchable before each recording</dd>
+          </div>
+          <div class="spec">
+            <dt>Format</dt>
+            <dd>WebM (VP9 + Opus) · MP4 (H.264 + AAC) where the Chrome build supports it</dd>
+          </div>
+          <div class="spec">
+            <dt>Audio</dt>
+            <dd>System sound and microphone mixed · echo cancellation, noise suppression and voice isolation</dd>
+          </div>
+          <div class="spec">
+            <dt>Camera frame</dt>
+            <dd>Circle, rounded or square · 10–40% of frame width · draggable during recording · optional mirror</dd>
+          </div>
+          <div class="spec">
+            <dt>Annotation</dt>
+            <dd>Highlighter, pen, text and blinker · five colours · undo and clear</dd>
+          </div>
+          <div class="spec">
+            <dt>Saving</dt>
+            <dd>Chrome's Downloads folder, in a subfolder you name · optional save-as dialog</dd>
+          </div>
+          <div class="spec">
+            <dt>Network</dt>
+            <dd>None. The extension requests no host permissions for its own use and contacts no server.</dd>
+          </div>
+          <div class="spec">
+            <dt>Requires</dt>
+            <dd>Chrome 116 or later, on macOS, Windows, Linux or ChromeOS</dd>
+          </div>
+        </dl>
+      </div>
+    </section>
+
+    <!-- ============ FEEDBACK ============ -->
+    <section class="section" id="feedback">
+      <div class="wrap">
+        <div class="feedback reveal">
+          <div class="feedback__side">
+            <p class="eyebrow">Your turn</p>
+            <h2>Tell us what to build next.</h2>
+            <p>
+              Zooroll is small and changes quickly. If something is missing, awkward, or broken on your machine, say
+              so here — feature requests are read in the order they arrive and shape what gets built.
+            </p>
+            <ul class="feedback__list">
+              <li><img src="zooroll-logo.png" alt="" /> <span>Ideas already in the queue: trimming, blur regions,
+                  keyboard shortcuts for the drawing tools.</span></li>
+              <li><img src="zooroll-logo.png" alt="" /> <span>Bug reports are more useful with your Chrome version and
+                  operating system.</span></li>
+              <li><img src="zooroll-logo.png" alt="" /> <span>Leaving your email is optional. Without it we cannot
+                  reply, only read.</span></li>
+            </ul>
+          </div>
+
+          <form class="form" id="feedbackForm" novalidate>
+            <div class="field">
+              <label id="kindLabel">What is this?</label>
+              <div class="segmented" role="group" aria-labelledby="kindLabel" id="kindGroup">
+                <button type="button" data-kind="review" aria-pressed="true">Review</button>
+                <button type="button" data-kind="feature" aria-pressed="false">Feature idea</button>
+                <button type="button" data-kind="bug" aria-pressed="false">Bug</button>
+              </div>
+            </div>
+
+            <div class="field" id="ratingField">
+              <label id="ratingLabel">How is it working out?</label>
+              <div class="petals" role="group" aria-labelledby="ratingLabel" id="petals">
+                <button type="button" class="petal" data-value="1" aria-label="1 out of 5"><img src="zooroll-logo.png"
+                    alt="" /></button>
+                <button type="button" class="petal" data-value="2" aria-label="2 out of 5"><img src="zooroll-logo.png"
+                    alt="" /></button>
+                <button type="button" class="petal" data-value="3" aria-label="3 out of 5"><img src="zooroll-logo.png"
+                    alt="" /></button>
+                <button type="button" class="petal" data-value="4" aria-label="4 out of 5"><img src="zooroll-logo.png"
+                    alt="" /></button>
+                <button type="button" class="petal" data-value="5" aria-label="5 out of 5"><img src="zooroll-logo.png"
+                    alt="" /></button>
+                <span class="petals__label" id="ratingText">Not rated</span>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="message">In your words</label>
+              <textarea id="message" name="message"
+                placeholder="What happened, what you expected, or what you wish it did."></textarea>
+              <span class="field__help" id="messageHelp">The only part we really need.</span>
+            </div>
+
+            <div class="two-up">
+              <div class="field">
+                <label for="name">Name <span class="field__help">optional</span></label>
+                <input type="text" id="name" name="name" placeholder="Ravi" autocomplete="name" />
+              </div>
+              <div class="field">
+                <label for="email">Email <span class="field__help">optional</span></label>
+                <input type="email" id="email" name="email" placeholder="you@example.com" autocomplete="email" />
+              </div>
+            </div>
+
+            <div class="form__foot">
+              <button class="btn btn--primary" type="submit" id="submitBtn">Send it</button>
+              <p class="form__status" id="formStatus" role="status" aria-live="polite"></p>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ FAQ ============ -->
+    <section class="section section--tight">
+      <div class="wrap">
+        <p class="eyebrow reveal">Questions</p>
+        <h2 class="reveal">Before you ask</h2>
+
+        <div class="faq reveal">
+          <details>
+            <summary>Does my recording go anywhere?</summary>
+            <p>
+              No. The extension holds no network permissions, so it cannot send your video anywhere even if it wanted
+              to. Recording works with the wifi switched off. The file is written to your Downloads folder by Chrome
+              itself.
+            </p>
+          </details>
+          <details>
+            <summary>Can I choose where files are saved?</summary>
+            <p>
+              Within Downloads, yes — name any subfolder and Chrome creates it. Chrome sandboxes extensions to the
+              Downloads directory, so no extension can write elsewhere. Turn on the save dialog if you would rather
+              pick a location each time.
+            </p>
+          </details>
+          <details>
+            <summary>Is there a time limit?</summary>
+            <p>
+              No limit is imposed. Long recordings are held in memory until you stop, so a very long session on a
+              machine with little free memory is the practical ceiling rather than any rule.
+            </p>
+          </details>
+          <details>
+            <summary>Can I record two people on a call?</summary>
+            <p>
+              Not today. Everything Zooroll records comes from your own machine. Recording a second person's camera
+              and voice would mean sending video over the internet, which is a different product with different
+              privacy trade-offs. If you want it, say so in the form above.
+            </p>
+          </details>
+          <details>
+            <summary>Why is it not on the Chrome Web Store?</summary>
+            <p>
+              It is on its way. Loading it unpacked works identically in the meantime and is how the extension is
+              developed and tested.
+            </p>
+          </details>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer wrap">
+    <span>Zooroll — a local screen recorder for Chrome.</span>
+    <span>Made for people who would rather show than write it out.</span>
+  </footer>
+
+  <script>
+    /* =============================================================
+       Where feedback goes.
+
+       Leave this empty and the form opens the visitor's mail client
+       with everything filled in — no server, no data collected here.
+       Paste a Formspree, Google Form or your own endpoint URL to
+       collect submissions instead; the payload is JSON.
+       ============================================================= */
+    const FEEDBACK_ENDPOINT = 'https://script.google.com/macros/s/AKfycbwcB76f_1oN-ZwCjce83NalbrcZu94vwrXuFfuLE9Y4nxaTvowbnJo0YgcuYgfbgrXa/exec';
+    const FEEDBACK_EMAIL = 'pradeep1706108@gmail.com';
+
+
+    /* The embedded copy of this page renders inside the stage. It drops the
+       stage itself, so the nesting stops at one level. */
+    const EMBED =
+      location.hash === '#embed' || new URLSearchParams(location.search).has('embed');
+    if (EMBED) document.documentElement.setAttribute('data-embed', '1');
+
+    /* ---------- masthead border on scroll ---------- */
+    const masthead = document.getElementById('masthead');
+    const onScroll = () => masthead.setAttribute('data-stuck', window.scrollY > 8 ? '1' : '0');
+    onScroll();
+    addEventListener('scroll', onScroll, { passive: true });
+
+    /* ---------- scroll reveal ---------- */
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          entry.target.setAttribute('data-seen', '1');
+          observer.unobserve(entry.target);
+        }
+      },
+      { rootMargin: '0px 0px -60px 0px' }
+    );
+    document.querySelectorAll('.reveal').forEach((el, i) => {
+      if (EMBED) return el.setAttribute('data-seen', '1'); // nothing scrolls in the frame
+      el.style.transitionDelay = `${Math.min(i % 6, 5) * 60}ms`;
+      observer.observe(el);
+    });
+
+    /* =============================================================
+       The stage. Same tools as the extension, same behaviour —
+       drawing, the blinker's three rings, a draggable bubble.
+       ============================================================= */
+    const stage = document.getElementById('stageBody');
+    if (!EMBED && stage) {
+      const canvas = document.getElementById('ink');
+      const ctx = canvas.getContext('2d');
+      const bubble = document.getElementById('bubble');
+
+      const ink = { tool: 'highlighter', color: '#ffd23f', drawing: false, points: [] };
+      const WIDTHS = { highlighter: 26, pen: 5 };
+
+      // Finished strokes live here; the one in progress is redrawn on top of it.
+      const committed = document.createElement('canvas');
+      const committedCtx = committed.getContext('2d');
+
+      function sizeCanvas() {
+        const rect = stage.getBoundingClientRect();
+        const dpr = window.devicePixelRatio || 1;
+        canvas.width = committed.width = Math.round(rect.width * dpr);
+        canvas.height = committed.height = Math.round(rect.height * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        committedCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+      sizeCanvas();
+      addEventListener('resize', sizeCanvas);
+
+      function repaint() {
+        const rect = stage.getBoundingClientRect();
+        ctx.clearRect(0, 0, rect.width, rect.height);
+        ctx.save();
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.drawImage(committed, 0, 0);
+        ctx.restore();
+        if (ink.points.length > 1) strokePoints(ink.points, ctx);
+      }
+
+      function strokePoints(points, target) {
+        if (points.length < 2) return;
+        const ctx = target;
+        ctx.save();
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.strokeStyle = ink.color;
+        ctx.lineWidth = WIDTHS[ink.tool] || 5;
+        ctx.globalAlpha = ink.tool === 'highlighter' ? 0.38 : 1;
+        ctx.beginPath();
+        ctx.moveTo(points[0].x, points[0].y);
+        for (let i = 1; i < points.length - 1; i++) {
+          const mid = { x: (points[i].x + points[i + 1].x) / 2, y: (points[i].y + points[i + 1].y) / 2 };
+          ctx.quadraticCurveTo(points[i].x, points[i].y, mid.x, mid.y);
+        }
+        ctx.lineTo(points[points.length - 1].x, points[points.length - 1].y);
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      function localPoint(event) {
+        const rect = stage.getBoundingClientRect();
+        return { x: event.clientX - rect.left, y: event.clientY - rect.top };
+      }
+
+      /* Three expanding rings, then gone — the blinker, at its real 3s life. */
+      function blink(point) {
+        const node = document.createElement('span');
+        node.className = 'blink';
+        node.style.left = `${point.x}px`;
+        node.style.top = `${point.y}px`;
+        node.style.color = ink.color;
+        node.innerHTML = '<span></span><span></span><span></span><b></b>';
+        stage.appendChild(node);
+        setTimeout(() => node.remove(), 2200);
+      }
+
+      stage.addEventListener('pointerdown', (event) => {
+        if (event.target === bubble || bubble.contains(event.target)) return;
+        if (event.target.closest('.toolbar')) return;
+
+        if (ink.tool === 'blink') return blink(localPoint(event));
+
+        ink.drawing = true;
+        ink.points = [localPoint(event)];
+        stage.setPointerCapture(event.pointerId);
+      });
+
+      stage.addEventListener('pointermove', (event) => {
+        if (!ink.drawing) return;
+        const point = localPoint(event);
+        const last = ink.points[ink.points.length - 1];
+        if (Math.hypot(point.x - last.x, point.y - last.y) < 2) return;
+        ink.points.push(point);
+        repaint();
+      });
+
+      const endStroke = () => {
+        if (!ink.drawing) return;
+        ink.drawing = false;
+        strokePoints(ink.points, committedCtx); // bake it in
+        ink.points = [];
+        repaint();
+      };
+      stage.addEventListener('pointerup', endStroke);
+      stage.addEventListener('pointercancel', endStroke);
+      stage.addEventListener('pointerleave', endStroke);
+
+      /* toolbar */
+      document.querySelector('.toolbar').addEventListener('click', (event) => {
+        const button = event.target.closest('button');
+        if (!button) return;
+
+        if (button.dataset.tool) {
+          ink.tool = button.dataset.tool;
+          document
+            .querySelectorAll('.tool[data-tool]')
+            .forEach((b) => b.setAttribute('aria-pressed', String(b === button)));
+          stage.style.cursor = ink.tool === 'blink' ? 'pointer' : 'crosshair';
+        }
+        if (button.dataset.color) {
+          ink.color = button.dataset.color;
+          document
+            .querySelectorAll('.swatch')
+            .forEach((b) => b.setAttribute('aria-pressed', String(b === button)));
+        }
+        if (button.dataset.act === 'clear') {
+          const rect = stage.getBoundingClientRect();
+          committedCtx.clearRect(0, 0, rect.width, rect.height);
+          ink.points = [];
+          repaint();
+        }
+      });
+
+      /* draggable bubble */
+      (() => {
+        let dragging = false;
+        let grabX = 0;
+        let grabY = 0;
+
+        bubble.addEventListener('pointerdown', (event) => {
+          // The bubble captures the pointer to drag, which retargets everything
+          // that follows — including the click the button inside it needs.
+          if (event.target.closest('.bubble__cta')) return;
+          dragging = true;
+          const rect = bubble.getBoundingClientRect();
+          grabX = event.clientX - rect.left;
+          grabY = event.clientY - rect.top;
+          bubble.setPointerCapture(event.pointerId);
+          event.stopPropagation();
+        });
+
+        bubble.addEventListener('pointermove', (event) => {
+          if (!dragging) return;
+          const rect = stage.getBoundingClientRect();
+          const size = bubble.offsetWidth;
+          const x = Math.min(Math.max(0, event.clientX - rect.left - grabX), rect.width - size);
+          const y = Math.min(Math.max(0, event.clientY - rect.top - grabY), rect.height - bubble.offsetHeight);
+          bubble.style.left = `${(x / rect.width) * 100}%`;
+          bubble.style.top = `${(y / rect.height) * 100}%`;
+        });
+
+        const drop = () => (dragging = false);
+        bubble.addEventListener('pointerup', drop);
+        bubble.addEventListener('pointercancel', drop);
+
+        // keyboard nudging, so the demo is not pointer-only
+        bubble.addEventListener('keydown', (event) => {
+          const moves = { ArrowLeft: [-3, 0], ArrowRight: [3, 0], ArrowUp: [0, -3], ArrowDown: [0, 3] };
+          const move = moves[event.key];
+          if (!move) return;
+          event.preventDefault();
+          const left = parseFloat(bubble.style.left || '68');
+          const top = parseFloat(bubble.style.top || '52');
+          bubble.style.left = `${Math.min(77, Math.max(0, left + move[0]))}%`;
+          bubble.style.top = `${Math.min(77, Math.max(0, top + move[1]))}%`;
+        });
+      })();
+
+      /* Scale the embedded page so the frame reads as a 1440px desktop rather
+         than a cramped mobile layout. */
+      (() => {
+        const page = document.getElementById('stagePage');
+        if (!page) return;
+        const fit = () => {
+          const width = stage.getBoundingClientRect().width;
+          page.style.transform = `scale(${width / 1440})`;
+        };
+        fit();
+        addEventListener('resize', fit);
+      })();
+
+      /* =============================================================
+         The camera bubble uses the visitor's own camera, on request.
+         Nothing is captured, nothing leaves the page — it is a live
+         <video> element and no recording is made.
+         ============================================================= */
+      (() => {
+        const video = document.getElementById('bubbleVideo');
+        const cta = document.getElementById('camCta');
+        const offLink = document.getElementById('camOffLink');
+        const offBtn = document.getElementById('camOff');
+        let stream = null;
+
+        const setState = (state) => bubble.setAttribute('data-cam', state);
+
+        cta.addEventListener('click', async (event) => {
+          event.stopPropagation(); // do not start a drag
+          const previous = cta.innerHTML;
+          cta.textContent = 'Asking…';
+
+          // file:// is a secure context in Chrome, but not in every browser, and
+          // without one getUserMedia is simply absent.
+          if (!navigator.mediaDevices?.getUserMedia) {
+            setState('denied');
+            cta.innerHTML = 'Your browser blocks camera access on this page. Serve it over https or localhost.';
+            return;
+          }
+
+          try {
+            stream = await navigator.mediaDevices.getUserMedia({ video: { width: { ideal: 640 } }, audio: false });
+            video.srcObject = stream;
+            await video.play().catch(() => { });
+            setState('live');
+            offLink.hidden = false;
+          } catch (err) {
+            setState('denied');
+            // Chrome blocks links to its own settings, so name the control instead.
+            if (err?.name === 'NotAllowedError') {
+              cta.innerHTML = 'Blocked — allow the camera from the icon in the address bar, then <u>try again</u>';
+            } else if (err?.name === 'NotFoundError') {
+              cta.innerHTML = 'No camera found on this computer.';
+            } else {
+              cta.innerHTML = `Camera unavailable: ${err?.name || 'unknown error'}. <u>Try again</u>`;
+            }
+            if (!cta.textContent.includes('No camera')) cta.dataset.retry = '1';
+            void previous;
+          }
+        });
+
+        offBtn?.addEventListener('click', () => {
+          stream?.getTracks().forEach((track) => track.stop());
+          stream = null;
+          video.srcObject = null;
+          setState('off');
+          cta.textContent = 'Put me in it';
+          offLink.hidden = true;
+        });
+
+        addEventListener('pagehide', () => stream?.getTracks().forEach((track) => track.stop()));
+      })();
+
+      /* the clock keeps time, because a recorder that does not is unconvincing */
+      (() => {
+        let seconds = 4;
+        const clock = document.getElementById('clock');
+        const toolClock = document.getElementById('toolClock');
+        setInterval(() => {
+          seconds++;
+          const pad = (n) => String(n).padStart(2, '0');
+          const text = `${pad(Math.floor(seconds / 3600))}:${pad(Math.floor(seconds / 60) % 60)}:${pad(seconds % 60)}`;
+          clock.textContent = text;
+          toolClock.textContent = text;
+        }, 1000);
+      })();
+
+    } /* end of stage block */
+
+    /* ---------- mode tabs ---------- */
+    document.querySelectorAll('.mode').forEach((tab) => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.mode').forEach((t) => t.setAttribute('aria-selected', String(t === tab)));
+        document.querySelectorAll('.modeview').forEach((view) => {
+          if (view.dataset.view === tab.dataset.mode) view.setAttribute('data-active', '1');
+          else view.removeAttribute('data-active');
+        });
+      });
+    });
+
+    /* =============================================================
+       Feedback form
+       ============================================================= */
+    const form = document.getElementById('feedbackForm');
+    const status = document.getElementById('formStatus');
+    const submitBtn = document.getElementById('submitBtn');
+    const ratingField = document.getElementById('ratingField');
+    const ratingText = document.getElementById('ratingText');
+    const RATING_WORDS = ['Not rated', 'Rough', 'Needs work', 'Fine', 'Good', 'Excellent'];
+    let kind = 'review';
+    let rating = 0;
+
+    function setStatus(text, tone) {
+      status.textContent = text;
+      if (tone) status.setAttribute('data-tone', tone);
+      else status.removeAttribute('data-tone');
+    }
+
+    document.getElementById('kindGroup').addEventListener('click', (event) => {
+      const button = event.target.closest('button');
+      if (!button) return;
+      kind = button.dataset.kind;
+      document
+        .querySelectorAll('#kindGroup button')
+        .forEach((b) => b.setAttribute('aria-pressed', String(b === button)));
+
+      // A star rating on a bug report is noise; ask only where it means something.
+      ratingField.hidden = kind !== 'review';
+      document.getElementById('messageHelp').textContent =
+        kind === 'bug'
+          ? 'What you did, what happened, and your Chrome version if you have it.'
+          : kind === 'feature'
+            ? 'Describe the moment you wished it existed — that is more useful than the feature name.'
+            : 'The only part we really need.';
+    });
+
+    document.getElementById('petals').addEventListener('click', (event) => {
+      const button = event.target.closest('.petal');
+      if (!button) return;
+      rating = Number(button.dataset.value);
+      document
+        .querySelectorAll('.petal')
+        .forEach((p) => p.setAttribute('data-on', Number(p.dataset.value) <= rating ? '1' : '0'));
+      ratingText.textContent = RATING_WORDS[rating];
+    });
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const message = document.getElementById('message').value.trim();
+      const name = document.getElementById('name').value.trim();
+      const email = document.getElementById('email').value.trim();
+
+      if (message.length < 4) {
+        setStatus('Add a line or two so we know what you mean.', 'error');
+        document.getElementById('message').focus();
+        return;
+      }
+      if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        setStatus('That email address does not look right. Leave it blank if you prefer.', 'error');
+        document.getElementById('email').focus();
+        return;
+      }
+
+      const payload = {
+        kind,
+        rating: kind === 'review' ? rating : null,
+        message,
+        name,
+        email,
+        page: location.href,
+        sentAt: new Date().toISOString()
+      };
+
+      submitBtn.disabled = true;
+      setStatus('Sending…');
+
+      if (FEEDBACK_ENDPOINT) {
+        try {
+          // text/plain keeps this a "simple" request. With application/json
+          // the browser sends a CORS preflight first, and Apps Script web apps
+          // do not answer OPTIONS — the request fails before it is ever sent.
+          const response = await fetch(FEEDBACK_ENDPOINT, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify(payload)
+          });
+          if (!response.ok) throw new Error(`Server said ${response.status}`);
+          form.reset();
+          rating = 0;
+          document.querySelectorAll('.petal').forEach((p) => p.setAttribute('data-on', '0'));
+          ratingText.textContent = RATING_WORDS[0];
+          setStatus('Sent. Thank you — it is read, not filed away.', 'ok');
+        } catch (err) {
+          setStatus(`That did not go through: ${err.message}. Try again in a moment.`, 'error');
+        } finally {
+          submitBtn.disabled = false;
+        }
+        return;
+      }
+
+      // No endpoint configured: hand it to the visitor's mail client instead
+      // of pretending it was delivered.
+      const subject = `Zooroll ${kind}${rating ? ` — ${rating}/5` : ''}`;
+      const body = [
+        message,
+        '',
+        name ? `From: ${name}` : '',
+        email ? `Reply to: ${email}` : '',
+        `Sent from: ${location.href}`
+      ]
+        .filter(Boolean)
+        .join('\n');
+      location.href = `mailto:${FEEDBACK_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      setStatus('Your mail app is opening with this filled in. Press send there.', 'ok');
+      submitBtn.disabled = false;
+    });
+  </script>
+</body>
+
+</html>
