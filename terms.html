@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Terms and Conditions — Zooroll</title>
+  <meta name="description" content="The terms you agree to when you use the Zooroll extension and website." />
+  <link rel="icon" href="zooroll-logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #fbfbfb;
+      --surface: #ffffff;
+      --surface-2: #f4effc;
+      --line: #e7e0f2;
+      --line-soft: #efeaf7;
+      --text: #1c1826;
+      --muted: #6c6580;
+      --primary: #9b5de5;
+      --primary-strong: #8348d6;
+      --primary-soft: rgba(155, 93, 229, 0.12);
+      --part: #b9770e;
+      --display: "Bricolage Grotesque", "Trebuchet MS", system-ui, sans-serif;
+      --body: "Instrument Sans", system-ui, -apple-system, sans-serif;
+      --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: var(--ink);
+      color: var(--text);
+      font-family: var(--body);
+      font-size: 16px;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a {
+      color: var(--primary);
+    }
+
+    .wrap {
+      width: min(760px, 100% - 44px);
+      margin-inline: auto;
+    }
+
+    .wide {
+      width: min(1180px, 100% - 44px);
+      margin-inline: auto;
+    }
+
+    .masthead {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background: rgba(251, 251, 251, 0.9);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .masthead__inner {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding: 13px 0;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: var(--display);
+      font-weight: 700;
+      font-size: 1.12rem;
+      letter-spacing: -0.02em;
+      text-decoration: none;
+      color: inherit;
+      margin-right: auto;
+    }
+
+    .brand img {
+      width: 28px;
+      height: 28px;
+    }
+
+    .navlink {
+      text-decoration: none;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .navlink:hover {
+      color: var(--text);
+    }
+
+    h1,
+    h2,
+    h3 {
+      font-family: var(--display);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      margin: 0;
+    }
+
+    h1 {
+      font-size: clamp(2.1rem, 4.6vw, 3rem);
+    }
+
+    h2 {
+      font-size: 1.42rem;
+      margin: 44px 0 12px;
+    }
+
+    h3 {
+      font-size: 1.06rem;
+      margin: 26px 0 8px;
+    }
+
+    p,
+    ul,
+    ol {
+      margin: 0 0 14px;
+    }
+
+    ul,
+    ol {
+      padding-left: 22px;
+    }
+
+    li {
+      margin-bottom: 7px;
+    }
+
+    .eyebrow {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--primary);
+      margin-bottom: 12px;
+    }
+
+    .updated {
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: 14px;
+    }
+
+    .lede {
+      color: var(--muted);
+      font-size: 1.05rem;
+      margin-top: 18px;
+    }
+
+    header.page {
+      padding: 62px 0 8px;
+    }
+
+    main {
+      padding-bottom: 80px;
+    }
+
+    .callout {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-left: 4px solid var(--primary);
+      border-radius: 12px;
+      padding: 22px 24px;
+      margin: 26px 0;
+    }
+
+    .callout p:last-child {
+      margin-bottom: 0;
+    }
+
+    .callout--warn {
+      border-left-color: var(--part);
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin: 16px 0 22px;
+      font-size: 0.93rem;
+    }
+
+    th,
+    td {
+      text-align: left;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--line-soft);
+      vertical-align: top;
+    }
+
+    th {
+      font-weight: 600;
+      background: var(--surface-2);
+    }
+
+    code {
+      font-family: var(--mono);
+      font-size: 0.86em;
+      background: var(--surface-2);
+      padding: 2px 6px;
+      border-radius: 5px;
+    }
+
+    .footer {
+      border-top: 1px solid var(--line);
+      padding: 28px 0 52px;
+      color: var(--muted);
+      font-size: 0.86rem;
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      justify-content: space-between;
+    }
+
+    .footer a {
+      color: var(--muted);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="masthead">
+    <div class="wide masthead__inner">
+      <a class="brand" href="index.html"><img src="zooroll-logo.png" alt="" width="28" height="28" />Zooroll</a>
+      <a class="navlink" href="privacy.html">Privacy</a>
+      <a class="navlink" href="index.html">Back to site</a>
+    </div>
+  </div>
+
+  <header class="page wrap">
+    <p class="eyebrow">Legal</p>
+    <h1>Terms and Conditions</h1>
+    <p class="lede">
+      The agreement between you and us when you use Zooroll. It is short, because a tool that keeps your files on
+      your own machine needs far fewer rules than one that holds them for you.
+    </p>
+    <p class="updated">Last updated: <span id="updated">10-08-2026</span> · Applies to the Zooroll browser extension and
+      this website</p>
+  </header>
+
+  <main class="wrap">
+    <div class="callout">
+      <p><strong>The short version.</strong></p>
+      <p>
+        Zooroll is free and provided as-is. You own your recordings entirely. You are responsible for what you
+        record and who you record — the law on recording other people varies by country and it is on you to know
+        which applies. We cannot recover a recording for you, because we never had it.
+      </p>
+    </div>
+
+    <h2>1. Agreement</h2>
+    <p>
+      By installing or using Zooroll (the "extension") or this website, you agree to these terms. If you do not
+      agree, do not use them.
+    </p>
+
+    <h2>2. Licence</h2>
+    <p>
+      We grant you a personal, non-exclusive, revocable licence to use the extension for any lawful purpose,
+      including commercial use, at no cost. You may not:
+    </p>
+    <ul>
+      <li>sell, rent or redistribute the extension as your own product;</li>
+      <li>decompile or modify it in order to remove attribution and republish it;</li>
+      <li>use it to break the law, or to breach another service's terms.</li>
+    </ul>
+    <p>
+      The Zooroll name, logo and website design remain ours. Nothing here transfers them to you.
+    </p>
+
+    <h2>3. Your recordings are yours</h2>
+    <p>
+      We claim no ownership, licence or interest in anything you record. Recordings are written to your own
+      computer and never reach us, so we have no ability to view, copy, use, retain or delete them. Equally, we
+      cannot recover a recording you have lost, and we cannot help if a file is corrupted, overwritten or deleted.
+      Keep your own backups.
+    </p>
+
+    <h2>4. What you are responsible for</h2>
+    <p>
+      This is the part that matters most, so it is stated plainly. You alone are responsible for what you record
+      and for having the right to record it. In particular:
+    </p>
+    <ul>
+      <li>
+        <strong>Recording other people.</strong> Consent laws differ. Some places allow recording a conversation
+        you are part of; others require everyone's agreement, and the rules may follow the other person's location
+        rather than yours. Telling people you are recording is both courteous and the simplest way to stay on the
+        right side of this.
+      </li>
+      <li>
+        <strong>Other people's content.</strong> Capturing films, television, music, paid courses or live sport is
+        usually copyright infringement regardless of the tool used.
+      </li>
+      <li>
+        <strong>Confidential material.</strong> If your employer, client or regulator restricts what may be
+        recorded, those restrictions apply to your use of Zooroll.
+      </li>
+      <li>
+        <strong>Other services' terms.</strong> Some meeting platforms notify participants when a recording
+        starts. Recording externally to avoid that notification may breach their terms, and defeats a consent
+        mechanism people rely on.
+      </li>
+    </ul>
+    <p>
+      We do not monitor what you record and could not if we wished to. That places the responsibility with you.
+    </p>
+
+    <h2>5. Third-party services</h2>
+    <p>
+      The sharing buttons open other companies' websites so that you can upload a file yourself. We do not control
+      those services and are not responsible for them. Once your recording is on YouTube, WhatsApp, Facebook,
+      LinkedIn or anywhere else, that service's terms apply to it, including any rights it takes over content you
+      upload.
+    </p>
+
+    <h2>6. Availability and changes</h2>
+    <p>
+      Zooroll is offered without any promise of continued availability. We may change, suspend or discontinue it,
+      or any feature of it, at any time. Because the extension runs locally, a copy you have already installed will
+      generally keep working, but browser updates may break it and we do not guarantee compatibility with future
+      versions of Chrome.
+    </p>
+
+    <h2>7. No warranty</h2>
+    <p>
+      The extension is provided <strong>"as is" and "as available", without warranties of any kind</strong>, express
+      or implied, including merchantability, fitness for a particular purpose and non-infringement. We do not
+      warrant that it will be uninterrupted, error-free, or that any given recording will succeed, be of a
+      particular quality, or be readable afterwards.
+    </p>
+    <p>
+      Recording is not always reliable through no fault of the software: a browser or operating system update, a
+      camera being unplugged, running out of disk space, or a computer sleeping mid-recording can all end a
+      recording. <strong>Do not rely on Zooroll as the only record of something you cannot repeat.</strong>
+    </p>
+
+    <h2>8. Limitation of liability</h2>
+    <p>
+      To the fullest extent the law allows, we are not liable for any indirect, incidental, special or
+      consequential damages, nor for lost recordings, lost data, lost profits, lost opportunities or business
+      interruption, arising from your use of or inability to use Zooroll.
+    </p>
+    <p>
+      Where liability cannot be excluded, it is limited to the greater of the amount you paid us for Zooroll —
+      which is nothing — or <strong>$0</strong>.
+    </p>
+    <p>
+      Some jurisdictions do not allow certain exclusions, so parts of this section may not apply to you. Nothing
+      here limits liability for death or personal injury caused by negligence, or for fraud.
+    </p>
+
+    <h2>9. Indemnity</h2>
+    <p>
+      You agree to indemnify us against claims, damages and reasonable legal costs arising from your use of
+      Zooroll in breach of these terms or of the law — most obviously, a claim brought by someone you recorded
+      without the right to do so.
+    </p>
+
+    <h2>10. Privacy</h2>
+    <p>
+      Our <a href="privacy.html">Privacy Policy</a> forms part of these terms and explains what little data exists
+      and where it lives.
+    </p>
+
+    <h2>11. Governing law</h2>
+    <p>
+      These terms are governed by the laws of <strong>INDIA</strong>, and the courts of
+      <strong>DELHI</strong> have exclusive jurisdiction, without regard to conflict of law rules.
+    </p>
+
+    <h2>12. Changes to these terms</h2>
+    <p>
+      We may update these terms. The date at the top will change, and continuing to use Zooroll after that means
+      you accept the update. For material changes we will say what changed rather than silently replace the text.
+    </p>
+
+  </main>
+
+  <footer class="footer wide">
+    <span>Zooroll — a local screen recorder for Chrome.</span>
+    <span><a href="index.html">Home</a> · <a href="compare.html">Compare</a> · <a href="privacy.html">Privacy</a></span>
+  </footer>
+
+  <script>
+    document.getElementById('updated').textContent = '10-08-2026';
+  </script>
+</body>
+
+</html>
